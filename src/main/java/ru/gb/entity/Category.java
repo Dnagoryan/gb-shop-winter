@@ -1,16 +1,14 @@
 package ru.gb.entity;
 
+
 import lombok.*;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import ru.gb.entity.enums.Status;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -20,22 +18,18 @@ import java.util.Set;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table (name = "product")
+@Table(name = "category")
 @EntityListeners(AuditingEntityListener.class)
-public class Product {
+public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "ID")
     private Long id;
+
     @Column(name = "title")
     private String title;
-    @Column(name = "cost")
-    private BigDecimal cost;
-    @Column(name = "manufacture_date")
-    private LocalDate manufactureDate;
-    @ManyToOne
-    @JoinColumn(name = "manufacturer_id")
-    private Manufacturer manufacturer;
+
+
 
     @Version
     @Column(name = "VERSION")
@@ -53,24 +47,20 @@ public class Product {
     @Column(name = "LAST_MODIFIED_DATE")
     private LocalDateTime lastModifiedDate;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status")
-    private Status status;
 
-    @ManyToMany(cascade ={CascadeType.MERGE},fetch = FetchType.EAGER )
+
+    @ManyToMany(cascade ={CascadeType.MERGE}, fetch = FetchType.EAGER )
     @JoinTable(name = "product_category",
-            joinColumns = @JoinColumn(name = "product_id"),
-            inverseJoinColumns = @JoinColumn(name = "category_id"))
-    private Set<Category> categories ;
+            joinColumns = @JoinColumn(name = "category_id"),
+            inverseJoinColumns = @JoinColumn(name = "product_id"))
+    private Set<Product> products ;
 
     @Override
     public String toString() {
-        return "Product{" +
+        return "Category{" +
                 "id=" + id +
                 ", title='" + title + '\'' +
-                ", cost=" + cost +
-                ", manufactureDate=" + manufactureDate +
-//                ", manufacturer=" + manufacturer.getName() +
+                ", products=" + products +
                 "}\n";
     }
 }

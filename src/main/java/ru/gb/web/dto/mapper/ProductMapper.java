@@ -3,7 +3,9 @@ package ru.gb.web.dto.mapper;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import ru.gb.dao.CategoryDao;
 import ru.gb.dao.ManufacturerDao;
+import ru.gb.entity.Category;
 import ru.gb.entity.Manufacturer;
 import ru.gb.entity.Product;
 import ru.gb.web.dto.ProductDto;
@@ -20,12 +22,30 @@ public interface ProductMapper {
     @Mapping(source = "manufacturer", target = "manufacturerDto")
     ProductManufacturerDto toProductManufacturerDto(Product product);
 
+//    @Mapping(source = "categories", target = "categoryDto")
+//    ProductCategoryDto toProductCategoryDto(Product product);
+
     default Manufacturer getManufacturer(String manufacturer, @Context ManufacturerDao manufacturerDao) {
+//        String category, @Context CategoryDao categoryDao
+//        categoryDao.findByName(category).orElseThrow(NoSuchElementException::new);
+//        Map<Manufacturer, Category> manufacturerCategoryList=new ConcurrentHashMap<>();
+//        manufacturerCategoryList.put(manufacturerDao.findByName(manufacturer).orElseThrow(NoSuchElementException::new),
+//                categoryDao.findByName(category).orElseThrow(NoSuchElementException::new));
         return manufacturerDao.findByName(manufacturer).orElseThrow(NoSuchElementException::new);
     }
 
     default String getManufacturer(Manufacturer manufacturer) {
         return manufacturer.getName();
     }
+
+
+//    default Category getCategory(String category, @Context CategoryDao categoryDao) {
+//        return categoryDao.findByTitle(category).orElseThrow(NoSuchElementException::new);
+//    }
+//
+//    default String getCategory(Category category) {
+//        return category.getTitle();
+//    }
+
 
 }

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import ru.gb.dao.CategoryDao;
 import ru.gb.dao.ManufacturerDao;
 import ru.gb.dao.ProductDao;
 import ru.gb.entity.Product;
@@ -28,6 +29,7 @@ public class ProductService {
     private final ProductDao productDao;
     private final ManufacturerDao manufacturerDao;
     private final ProductMapper productMapper;
+    private final CategoryDao categoryDao;
 
     @Transactional(propagation = Propagation.NEVER, isolation = Isolation.DEFAULT)
     public long count() {
@@ -93,4 +95,6 @@ public class ProductService {
     public List<ProductManufacturerDto> findAllInfo() {
         return productDao.findAll().stream().map(productMapper::toProductManufacturerDto).collect(Collectors.toList());
     }
+
+
 }

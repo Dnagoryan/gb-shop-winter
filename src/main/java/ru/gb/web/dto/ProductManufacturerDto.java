@@ -22,4 +22,5 @@ public class ProductManufacturerDto {
     @PastOrPresent
     private LocalDate manufactureDate;
     private ManufacturerDto manufacturerDto;
+
 }
