@@ -13,24 +13,21 @@ import ru.gb.web.dto.ProductManufacturerDto;
 
 import java.util.NoSuchElementException;
 
-@Mapper(uses = ManufacturerMapper.class)
+@Mapper(uses = {ManufacturerMapper.class, CategoryMapper.class})
 public interface ProductMapper {
-    Product toProduct(ProductDto productDto, @Context ManufacturerDao manufacturerDao);
+    Product toProduct(ProductDto productDto,
+                      @Context ManufacturerDao manufacturerDao,
+                      @Context CategoryDao categoryDao);
 
     ProductDto toProductDto(Product product);
+
 
     @Mapping(source = "manufacturer", target = "manufacturerDto")
     ProductManufacturerDto toProductManufacturerDto(Product product);
 
-//    @Mapping(source = "categories", target = "categoryDto")
-//    ProductCategoryDto toProductCategoryDto(Product product);
+    default Manufacturer getManufacturer(String manufacturer,
+                                         @Context ManufacturerDao manufacturerDao) {
 
-    default Manufacturer getManufacturer(String manufacturer, @Context ManufacturerDao manufacturerDao) {
-//        String category, @Context CategoryDao categoryDao
-//        categoryDao.findByName(category).orElseThrow(NoSuchElementException::new);
-//        Map<Manufacturer, Category> manufacturerCategoryList=new ConcurrentHashMap<>();
-//        manufacturerCategoryList.put(manufacturerDao.findByName(manufacturer).orElseThrow(NoSuchElementException::new),
-//                categoryDao.findByName(category).orElseThrow(NoSuchElementException::new));
         return manufacturerDao.findByName(manufacturer).orElseThrow(NoSuchElementException::new);
     }
 
@@ -39,13 +36,11 @@ public interface ProductMapper {
     }
 
 
-//    default Category getCategory(String category, @Context CategoryDao categoryDao) {
-//        return categoryDao.findByTitle(category).orElseThrow(NoSuchElementException::new);
-//    }
-//
-//    default String getCategory(Category category) {
-//        return category.getTitle();
-//    }
+    default Category getCategory(String category, @Context CategoryDao categoryDao) {
+        return categoryDao.findByTitle(category).orElseThrow(NoSuchElementException::new);
+    }
 
-
+    default String getCategory(Category category) {
+        return category.getTitle();
+    }
 }

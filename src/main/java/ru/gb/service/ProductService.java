@@ -39,7 +39,7 @@ public class ProductService {
 
     @Transactional
     public ProductDto save(final ProductDto productDto) {
-        Product product = productMapper.toProduct(productDto, manufacturerDao);
+        Product product = productMapper.toProduct(productDto, manufacturerDao, categoryDao);
         if (product.getId() != null) {
             productDao.findById(productDto.getId()).ifPresent(
                     (p) -> product.setVersion(p.getVersion())
