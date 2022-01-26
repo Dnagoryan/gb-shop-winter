@@ -6,9 +6,9 @@ encrypt:
   key-store:
     alias: ${ENCRYPT_KEYSTORE_ALIAS:gbshopkey}
     password: ${ENCRYPT_KEYSTORE_PASSWORD:123456}
-    location: ${ENCRYPT_KEYSTORE_LOCATION:file:///Users/artemkropotov/java_projects/geekbrains/gb-shop-winter/server.jks}
+    location: ${ENCRYPT_KEYSTORE_LOCATION:file:///C:\Users\79160\IdeaProjects\gb-shop-winter\server.jks}
 
 
 #  keytool -genkeypair -alias gbshopkey -keyalg RSA \
 #  -dname "CN=Web Server,OU=Unit,O=geekbrains,L=Moscow,C=Russia" \
-#  -keypass 123456 -keystore server.jks -storepass 123456
+#  -keypass 123456 -keystore server.jks -storepass 12345
