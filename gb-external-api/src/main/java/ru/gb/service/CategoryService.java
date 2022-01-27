@@ -1,53 +1,43 @@
 package ru.gb.service;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import ru.gb.dao.CategoryDao;
-import ru.gb.entity.Category;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+import ru.gb.service.feign.CategoryApi;
 import ru.gb.web.dto.CategoryDto;
-import ru.gb.web.dto.mapper.CategoryMapper;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-@Service
-@RequiredArgsConstructor
-@Slf4j
-public class CategoryService {
-
-    private final CategoryDao categoryDao;
-    private final CategoryMapper categoryMapper;
+@FeignClient(url = "localhost:8080/api/v1/category", value = "categoryApi")
+public interface CategoryService extends CategoryApi {
 
 
-    @Transactional
-    public CategoryDto save(final CategoryDto categoryDto) {
-        Category category = categoryMapper.toCategory(categoryDto);
-        if (category.getId() != null) {
-            categoryDao.findById(category.getId()).ifPresent(
-                    (p) -> category.setVersion(p.getVersion())
-            );
-        }
-        return categoryMapper.toCategoryDto(categoryDao.save(category));
-    }
+    @Override
+    @GetMapping(produces = "application/json;charset=UTF-8",
+            consumes = "application/json;charset=UTF-8")
+    List<CategoryDto> getCategoryList();
 
-    @Transactional(readOnly = true)
-    public CategoryDto findById(Long id) {
-        return categoryMapper.toCategoryDto(categoryDao.findById(id).orElse(null));
-    }
+    @Override
+    @GetMapping(produces = "application/json;charset=UTF-8",
+            consumes = "application/json;charset=UTF-8", value = "/{categoryId}")
+    ResponseEntity<?> getCategory(@PathVariable("categoryId") Long id);
+
+    @Override
+    @PostMapping(produces = "application/json;charset=UTF-8",
+            consumes = "application/json;charset=UTF-8")
+    ResponseEntity<?> handlePost(@Validated @RequestBody CategoryDto categoryDto);
+
+    @Override
+    @PutMapping(produces = "application/json;charset=UTF-8",
+            consumes = "application/json;charset=UTF-8", value = "/{categoryId}")
+    ResponseEntity<?> handleUpdate(@PathVariable("categoryId") Long id,
+                                   @Validated @RequestBody CategoryDto categoryDto);
+
+    @Override
+    @DeleteMapping(produces = "application/json;charset=UTF-8",
+            consumes = "application/json;charset=UTF-8", value = "/{categoryId}")
+    void deleteById(@PathVariable("categoryId") Long id);
 
 
-    public List<CategoryDto> findAll() {
-        return categoryDao.findAll().stream().map(categoryMapper::toCategoryDto).collect(Collectors.toList());
-    }
-
-    public void deleteById(Long id) {
-        try {
-            categoryDao.deleteById(id);
-        } catch (EmptyResultDataAccessException e) {
-            log.error(e.getMessage());
-        }
-    }
 }

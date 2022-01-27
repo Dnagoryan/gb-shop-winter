@@ -1,53 +1,39 @@
 package ru.gb.service;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import ru.gb.dao.ManufacturerDao;
-import ru.gb.entity.Manufacturer;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+import ru.gb.service.feign.ManufacturerApi;
 import ru.gb.web.dto.ManufacturerDto;
-import ru.gb.web.dto.mapper.ManufacturerMapper;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-@Service
-@RequiredArgsConstructor
-@Slf4j
-public class ManufacturerService {
+@FeignClient(url = "localhost:8080/api/v1/manufacturer", value = "manufacturerApi")
+public interface ManufacturerService extends ManufacturerApi {
 
-    private final ManufacturerDao manufacturerDao;
-    private final ManufacturerMapper manufacturerMapper;
+    @Override
+    @GetMapping(produces = "application/json;charset=UTF-8",
+            consumes = "application/json;charset=UTF-8")
+    List<ManufacturerDto> getManufacturerList();
 
+    @Override
+    @GetMapping(produces = "application/json;charset=UTF-8",
+            consumes = "application/json;charset=UTF-8", value = "/{manufacturerId}")
+    ResponseEntity<?> getManufacturer(@PathVariable("manufacturerId") Long id);
 
-    @Transactional
-    public ManufacturerDto save(final ManufacturerDto manufacturerDto) {
-        Manufacturer manufacturer = manufacturerMapper.toManufacturer(manufacturerDto);
-        if (manufacturer.getId() != null) {
-            manufacturerDao.findById(manufacturer.getId()).ifPresent(
-                    (p) -> manufacturer.setVersion(p.getVersion())
-            );
-        }
-        return manufacturerMapper.toManufacturerDto(manufacturerDao.save(manufacturer));
-    }
+    @Override
+    @PostMapping(produces = "application/json;charset=UTF-8",
+            consumes = "application/json;charset=UTF-8")
+    ResponseEntity<?> handlePost(@Validated @RequestBody ManufacturerDto manufacturerDto);
 
-    @Transactional(readOnly = true)
-    public ManufacturerDto findById(Long id) {
-        return manufacturerMapper.toManufacturerDto(manufacturerDao.findById(id).orElse(null));
-    }
+    @Override
+    @PutMapping(produces = "application/json;charset=UTF-8",
+            consumes = "application/json;charset=UTF-8", value = "/{manufacturerId}")
+    ResponseEntity<?> handleUpdate(@PathVariable("manufacturerId") Long id, @Validated @RequestBody ManufacturerDto manufacturerDto);
 
-
-    public List<ManufacturerDto> findAll() {
-        return manufacturerDao.findAll().stream().map(manufacturerMapper::toManufacturerDto).collect(Collectors.toList());
-    }
-
-    public void deleteById(Long id) {
-        try {
-            manufacturerDao.deleteById(id);
-        } catch (EmptyResultDataAccessException e) {
-            log.error(e.getMessage());
-        }
-    }
+    @Override
+    @DeleteMapping(produces = "application/json;charset=UTF-8",
+            consumes = "application/json;charset=UTF-8", value = "/{manufacturerId}")
+    void deleteById(@PathVariable("manufacturerId") Long id);
 }
