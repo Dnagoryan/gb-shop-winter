@@ -10,6 +10,7 @@ import ru.gb.api.manufacturer.dto.ManufacturerDto;
 
 import java.util.List;
 
+
 public interface ManufacturerGateway {
 
     @GetMapping
