@@ -13,11 +13,15 @@ import ru.gb.api.product.dto.ProductDto;
 import ru.gb.dao.CategoryDao;
 import ru.gb.dao.ManufacturerDao;
 import ru.gb.dao.ProductDao;
+import ru.gb.entity.Category;
 import ru.gb.entity.Product;
 import ru.gb.entity.enums.Status;
+import ru.gb.exceptions.ProductException;
 import ru.gb.web.dto.ProductManufacturerDto;
 import ru.gb.web.dto.mapper.ProductMapper;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -38,14 +42,30 @@ public class ProductService {
     }
 
     @Transactional
-    public ProductDto save(final ProductDto productDto) {
+    public ProductDto save(final ProductDto productDto) throws  Exception {
         Product product = productMapper.toProduct(productDto, manufacturerDao, categoryDao);
         if (product.getId() != null) {
             productDao.findById(productDto.getId()).ifPresent(
                     (p) -> product.setVersion(p.getVersion())
             );
+        } else {
+            checkForAvailability(productDto, product);
         }
         return productMapper.toProductDto(productDao.save(product));
+    }
+
+
+    private void checkForAvailability(ProductDto productDto, Product product) throws ProductException {
+        if (productDto.getCategory() == null || productDto.getManufacturer() == null) {
+            throw new ProductException("Укажите категорию и производителя.");
+        } else {
+            Optional<Category> optionalCategory = categoryDao.findByTitle(productDto.getCategory());
+            if (optionalCategory.isEmpty() ||
+                    manufacturerDao.findByName(productDto.getManufacturer()).isEmpty()) {
+                throw new ProductException("В базе не существует указанной категории или производителя ");
+            }
+            product.setCategories(new HashSet<>(Arrays.asList(optionalCategory.get())));
+        }
     }
 
 
